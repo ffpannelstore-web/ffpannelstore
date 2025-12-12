@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="google-site-verification" content="dPX2IQE60Zjm5ye6ImGqsxoZMcm7BtphNXCKT6DtN5s" /> 
+    <title>Pro FF Panel Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- DESIGN (GLOWING NEON) --- */
+        :root { 
+            --primary: #00ff88; 
+            --primary-light: #ccffcc; 
+            --dark: #080808; 
+            --card-bg: #151515; 
+            --glow: 0 0 15px rgba(0, 255, 136, 0.8); 
+            --shadow-3d: 0 6px 0 #00aa66; 
+            --sidebar-bg: #111;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        html, body { width: 100%; height: 100%; }
+        body { 
+            background-color: var(--dark); 
+            color: #f0f0f0; 
+            line-height: 1.6;
+            overflow-x: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        .content-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 15px; box-sizing: border-box; }
+        
+        /* Navigation */
+        nav { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 15px; background: rgba(0,0,0,0.98); 
+            position: sticky; top: 0; z-index: 1000; 
+            border-bottom: 3px solid var(--primary); 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            gap: 10px;
+        }
+        /* Logo is now clickable for Admin Access */
+        .logo { 
+            font-size: 1.3rem; font-weight: 900; color: var(--primary); 
+            text-shadow: var(--glow); cursor: pointer; user-select: none;
+        }
+        
+        header { text-align: center; padding: 60px 20px 40px; }
+        h1 { font-size: 2.1rem; font-weight: 900; text-shadow: var(--glow); line-height: 1.2; }
+        header p { font-size: 1rem; color: #aaa; margin-top: 12px; }
+
+        section { text-align: center; padding: 40px 0; }
+        h2 { font-size: 1.6rem; margin-bottom: 30px; color: white; text-shadow: 0 0 5px #fff; border-bottom: 2px dashed var(--primary); display: inline-block; padding-bottom: 5px; }
+
+        /* --- CARDS --- */
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px 0; }
+        .card { 
+            background: var(--card-bg); border: 2px solid #333; padding: 20px; 
+            border-radius: 12px; width: 100%; max-width: 320px; transition: 0.3s; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); position: relative;
+            overflow-wrap: break-word;
+        }
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); }
+        .price { font-size: 2.2rem; font-weight: 900; color: var(--primary); margin: 12px 0; text-shadow: 0 0 10px var(--primary); }
+        .card h3 { font-size: 1.2rem; margin-bottom: 6px; color: #fff; }
+        .setup-label { color:#ccc; font-size:0.95rem; margin-top:12px; text-align:left; }
+        
+        /* --- BUTTONS --- */
+        .btn { 
+            background: var(--primary); color: #000; font-weight: 900; padding: 12px 14px; 
+            width: 100%; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; 
+            margin-top: 14px; text-decoration: none; display: block; transition: 0.15s;
+            box-shadow: var(--shadow-3d); font-size: 1rem; text-align: center; box-sizing: border-box;
+        }
+        .btn:active { box-shadow: 0 3px 0 #00aa66; transform: translateY(3px); }
+        .btn:hover { background: var(--primary-light); box-shadow: 0 0 20px var(--primary-light), var(--shadow-3d); }
+
+        /* Preview buttons inside cards */
+        .btn-preview { background: #2a2a2a; color: #ccc; padding: 10px 12px; margin-top: 10px; border: 1px solid #555; font-size: 0.95rem; border-radius: 6px; transition: 0.2s; width: 100%; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-preview:hover { background: #3c3c3c; color: var(--primary); }
+
+        .nav-auth-btns { display: flex; gap: 8px; align-items:center; flex-wrap:wrap; }
+        .nav-auth-btns .btn-nav { 
+            background: none; border: 2px solid var(--primary); color: var(--primary); 
+            padding: 8px 12px; border-radius: 6px; font-weight: 700; cursor: pointer; 
+            transition: 0.15s; text-transform: uppercase; min-width: 0; flex: 0 1 auto; white-space: nowrap;
+        }
+        .nav-auth-btns .btn-nav:hover { background: var(--primary); color: #000; box-shadow: 0 0 12px var(--primary); }
+        
+        #user-dashboard-btns { display: none; gap: 10px; } 
+
+        .btn-approve { background: var(--primary); color: black !important; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;}
+        .btn-delete { background: #cc0000; color: white; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;}
+
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; padding: 16px; box-sizing: border-box; }
+        .modal-box { background: #1a1a1a; padding: 20px; border-radius: 12px; width: 100%; max-width: 900px; border: 3px solid var(--primary); box-shadow: var(--glow); max-height: 90vh; overflow-y: auto; box-sizing: border-box;}
+        .small-modal { max-width: 480px; padding: 16px; }
+        .qr-img { width: 250px; height: 250px; margin: 20px auto; display: block; border: 5px solid white; border-radius: 8px; object-fit: contain; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 2px solid #444; color: var(--primary); border-radius: 8px; font-size: 1.0rem; box-sizing: border-box; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 8px var(--primary); outline: none; }
+
+        .history-item { background: #1a1a1a; margin-bottom: 16px; padding: 14px; border-radius: 10px; border-left: 5px solid var(--primary); box-shadow: 0 5px 10px rgba(0,0,0,0.5); text-align: left; word-break: break-word; }
+        .history-item.pending { border-left-color: orange; }
+        
+        .admin-request-item { background: #1a1a1a; margin-bottom: 12px; padding: 12px; border-radius: 8px; border-left: 4px solid orange; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .admin-action-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* --- SIDEBAR STYLES --- */
+        .sidebar {
+            position: fixed; top: 0; right: 0; width: 320px; height: 100%;
+            background: var(--sidebar-bg); border-left: 3px solid var(--primary);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8); z-index: 2000;
+            padding: 20px; transform: translateX(100%); transition: transform 0.4s ease-in-out;
+            overflow-y: auto;
+        }
+        .sidebar.active { transform: translateX(0); }
+        
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .close-sidebar { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        
+        .sidebar-option { margin-bottom: 15px; border: 1px solid #333; border-radius: 8px; overflow: hidden; }
+        .sidebar-btn { width: 100%; padding: 12px; text-align: left; background: #1a1a1a; color: #fff; border: none; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items:center; gap:8px; }
+        .sidebar-btn:hover { background: #252525; color: var(--primary); }
+        .sidebar-content { display: none; padding: 12px; background: #111; border-top: 1px solid #333; }
+        .sidebar-content.show { display: block; }
+
+        /* Flash Sale Styles */
+        .flash-deal-box { border: 2px dashed var(--primary); padding: 10px; border-radius: 8px; text-align: center; animation: pulse 2s infinite; }
+        .old-price { text-decoration: line-through; color: #777; font-size: 0.9rem; }
+        .flash-price { color: var(--primary); font-size: 1.2rem; font-weight: bold; }
+        .timer { font-family: monospace; font-size: 1.2rem; color: yellow; margin-top: 5px; }
+        
+        /* Trust & Policy List */
+        .policy-list li { margin-bottom: 8px; font-size: 0.9rem; color: #ccc; list-style: none; border-left: 2px solid var(--primary); padding-left: 10px; }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 15px var(--primary); } 100% { box-shadow: 0 0 5px var(--primary); } }
+
+        /* Footer */
+        footer { padding: 30px 20px; text-align: center; border-top: 1px solid #333; margin-top: 40px; }
+        .social-icons a { color: white; font-size: 1.6rem; margin: 0 12px; transition: 0.3s; display:inline-block; }
+        .social-icons a:hover { color: var(--primary); text-shadow: var(--glow); }
+
+        /* Admin control buttons area (responsive) */
+        .admin-controls { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:15px; }
+        .admin-controls .btn { width: auto !important; flex: 1 1 220px; min-width: 120px; max-width: 260px; padding: 10px 12px; }
+
+        /* Small improvements to avoid overflow for long words/URLs */
+        a, p, h3, input, .history-item, .admin-request-item { word-break: break-word; overflow-wrap: break-word; }
+
+        /* Mobile Fixes */
+        @media (max-width: 900px) {
+            .logo { font-size: 1.1rem; }
+            h1 { font-size: 1.6rem; }
+            .modal-box { padding: 14px; }
+        }
+
+        @media (max-width: 600px) {
+            .logo { flex-basis: 100%; text-align: center; margin-bottom: 6px; }
+            nav { flex-wrap: wrap; justify-content: center; gap:8px; padding:10px; }
+            .nav-auth-btns, #user-dashboard-btns { width: 100%; justify-content: center; margin-top: 5px; gap:8px; }
+            .nav-auth-btns .btn-nav { font-size: 0.85rem; flex: 1 1 auto; min-width: 0; padding: 8px 10px; }
+            .sidebar { width: 85%; }
+            .modal-box { padding: 12px; max-width: 95%; }
+            .admin-controls .btn { flex: 1 1 45%; min-width: 120px; max-width: 48%; }
+            .card { padding: 16px; }
+            .price { font-size: 1.8rem; }
+            .btn { padding: 10px 12px; font-size: 0.95rem; }
+            .qr-img { width: 200px; height: 200px; }
+        }
+
+        /* Prevent any accidental horizontal scrollbar */
+        @media (any-pointer:coarse) {
+            /* small touch devices safety */
+            body { -webkit-text-size-adjust: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar" class="sidebar" aria-hidden="true">
+        <div class="sidebar-header">
+            <h3 style="color:var(--primary)">Exclusive Menu</h3>
+            <button class="close-sidebar" onclick="toggleSidebar()" aria-label="Close menu"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="sidebar-option">
+            <button class="sidebar-btn" onclick="toggleOption('opt-flash')">Flash Sell <i class="fas fa-bolt" style="color:yellow"></i></button>
+            <div id="opt-flash" class="sidebar-content">
+                <div id="active-flash-container">
+                    <p style="color:#aaa; text-align:center;">No active flash sales right now.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-option">
+            <button class="sidebar-btn" onclick="toggleOption('opt-trust')">Trust & Policy <i class="fas fa-shield-alt"></i></button>
+            <div id="opt-trust" class="sidebar-content">
+                <h4 style="color:var(--primary); margin-bottom:10px;">Why Trust Us?</h4>
+                <ul class="policy-list">
+                    <li>Fully Antiban Hack 100% Safe</li>
+                    <li>Latest Version Panel at Low Price</li>
+                    <li>Customer Support 10AM to 8PM Available</li>
+                    <li>Instant Delivery System - Payment ke baad turant access</li>
+                    <li>24/7 Server Uptime - No crashes guaranteed</li>
+                </ul>
+                <h4 style="color:orange; margin:15px 0 10px;">Our Policy</h4>
+                <ul class="policy-list">
+                    <li>Ye pannel & hack apne jimmedari pe lagaye.</li>
+                    <li>Kripya isko aap apni second ID pe lagaye na ki real ID pe.</li>
+                    <li>Agar aap real ID pe lagaye to ID ban ya kuch bhi ho uske jimmedar aap khud honge.</li>
+                    <li>Payment refund available agar hack work na kare to (Proof required).</li>
+                    <li>Setup guide follow kare, 3-4 din baad ban hone par 50% refund (Contact Support).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sidebar-option">
+            <button class="sidebar-btn" onclick="toggleOption('opt-sub')">VIP Subscription <i class="fas fa-crown" style="color:gold"></i></button>
+            <div id="opt-sub" class="sidebar-content">
+                <div style="text-align:center;">
+                    <h3 style="color:gold; font-size:1.2rem;">VIP ACCESS</h3>
+                    <p style="color:#fff; font-weight:bold; font-size:1.4rem;">₹149 <span style="font-size:0.9rem; color:#aaa;">/ Lifetime</span></p>
+                    <ul style="text-align:left; margin:10px 0; font-size:0.9rem; color:#ccc;">
+                        <li><i class="fas fa-check" style="color:var(--primary)"></i> All Hacks & Panels Unlock (Free)</li>
+                        <li><i class="fas fa-check" style="color:var(--primary)"></i> Direct Admin Personal Insta Access</li>
+                    </ul>
+                    <div id="sub-status-area">
+                        <button class="btn" onclick="buySubscription()">GET SUBSCRIPTION</button>
+                    </div>
+                    <div id="admin-contact-area" style="display:none; margin-top:12px; border-top:1px solid #333; padding-top:10px;">
+                        <p style="color:var(--primary);">VIP Unlocked!</p>
+                        <a href="#" id="admin-insta-redirect" target="_blank" class="btn" style="background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); color:white;">Contact Admin (Insta)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-option">
+            <button class="sidebar-btn" onclick="openWhatsappSupport()">Customer Support <i class="fab fa-whatsapp" style="color:#25D366"></i></button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo" onclick="handleLogoClick()">100% TRUSTED PANEL SELLER <i class="fas fa-shield-alt"></i></div>
+        
+        <div id="auth-controls" class="nav-auth-btns" aria-label="Authentication">
+            <button class="btn-nav" onclick="window.openLoginModal()">Login</button>
+            <button class="btn-nav" onclick="window.openSignupModal()">Signup</button>
+        </div>
+        
+        <div id="user-dashboard-btns" class="nav-auth-btns" aria-label="User dashboard">
+            <button class="btn-nav" onclick="window.viewProductSection()">Buy Pannels</button>
+            <button class="btn-nav" onclick="window.showDashboard('purchases')">My Purchases</button>
+            <button class="btn-nav" onclick="window.showRequests()">My Requests</button>
+            <button class="btn-nav" style="background:var(--primary); color:black;" onclick="toggleSidebar()">MENU <i class="fas fa-bars"></i></button>
+            <button class="btn-nav" onclick="window.logoutUser()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </nav>
+    
+    <div class="content-wrapper">
+        <header>
+            <h1 id="welcome-message">Latest <span style="color:var(--primary)">Pannels</span> at Lowest Rate</h1>
+            <p>Fully Antiban Panel, 100% Safe | Real-time Approval System</p>
+        </header>
+
+        <section id="user-content-section" style="display:none;">
+            <h2 id="dashboard-title">My Dashboard</h2>
+
+            <div id="my-requests" style="display:none; text-align:left; max-width:900px; margin:0 auto;">
+                <h3 style="color:var(--primary); margin-bottom:15px;">My Requests (Pending)</h3>
+                <div id="requests-list">
+                    <p style="color:#aaa; text-align:center;">No pending requests.</p>
+                </div>
+            </div>
+
+            <div id="my-purchases" style="display:none; margin-top:20px; text-align:left;">
+                <h3 style="color:var(--primary); margin-bottom:15px; text-align: center;">Active Products / Purchase History</h3>
+                <div id="purchases-list">
+                    <p style="color:#aaa; text-align: center;">No approved purchases found.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="main-product-section" style="display:none;">
+            <h2>BUY A PANNEL</h2>
+            <div id="vip-unlocked-msg" style="display:none; margin-bottom:20px; color:gold; font-weight:bold; font-size:1.0rem;">
+                <i class="fas fa-crown"></i> VIP SUBSCRIPTION ACTIVE - ALL HACKS UNLOCKED
+            </div>
+
+            <div class="container">
+                <div class="card" id="prod-card-1">
+                    <h3>Only Headshot</h3>
+                    <p style="color:#ff4444; margin:10px 0;">Only 7 Days Use</p>
+                    <div class="price" id="price-1">₹49</div>
+
+                    <button class="btn-preview" onclick="openPreview(1)"><i class="fas fa-play"></i> Preview</button>
+
+                    <div class="setup-label">
+                        <strong>Setup (guide) video</strong>
+                    </div>
+                    <button class="btn-preview" onclick="openSetupVideo(1)"><i class="fas fa-video"></i> Watch video</button>
+
+                    <button class="btn" onclick="initiatePurchase(1, 'Only Headshot', 49)">BUY NOW</button>
+                </div>
+                <div class="card" id="prod-card-2">
+                    <h3>Headshot and Location</h3>
+                    <p style="color:#ff4444; margin:10px 0;">Only 7 Days Use</p>
+                    <div class="price" id="price-2">₹79</div>
+
+                    <button class="btn-preview" onclick="openPreview(2)"><i class="fas fa-play"></i> Preview</button>
+
+                    <div class="setup-label">
+                        <strong>Setup (guide) video</strong>
+                    </div>
+                    <button class="btn-preview" onclick="openSetupVideo(2)"><i class="fas fa-video"></i> Watch video</button>
+
+                    <button class="btn" onclick="initiatePurchase(2, 'Headshot & Location', 79)">BUY NOW</button>
+                </div>
+                <div class="card" id="prod-card-3">
+                    <h3>Magic Bullet and Hologram</h3>
+                    <p style="color:#ff4444; margin:10px 0;">Only 7 Days Use</p>
+                    <div class="price" id="price-3">₹99</div>
+
+                    <button class="btn-preview" onclick="openPreview(3)"><i class="fas fa-play"></i> Preview</button>
+
+                    <div class="setup-label">
+                        <strong>Setup (guide) video</strong>
+                    </div>
+                    <button class="btn-preview" onclick="openSetupVideo(3)"><i class="fas fa-video"></i> Watch video</button>
+
+                    <button class="btn" onclick="initiatePurchase(3, 'Magic Bullet & Hologram', 99)">BUY NOW</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="social-icons">
+            <a href="#" id="fb-icon" onclick="adminFacebookClick(event)"><i class="fab fa-facebook"></i></a>
+            <a href="#" id="insta-icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" id="yt-icon"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+
+    <div id="loginModal" class="modal" aria-hidden="true">
+        <div class="modal-box small-modal" role="dialog" aria-modal="true">
+            <h3 style="color:var(--primary); text-align:center;">LOGIN</h3>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn" onclick="loginUser()">Login</button>
+            <p style="color:#ccc; font-size:0.8rem; margin-top:10px; text-align:center;">Don't have an account? <span style="color:var(--primary); cursor:pointer;" onclick="openSignupModal()">Signup</span></p>
+            <button style="background:none; border:none; color:#666; margin-top:10px;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="signupModal" class="modal" aria-hidden="true">
+        <div class="modal-box small-modal" role="dialog" aria-modal="true">
+            <h3 style="color:var(--primary); text-align:center;">SIGN UP</h3>
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-pass" placeholder="Password (Min 6 chars)">
+            <button class="btn" onclick="signupUser()">Signup</button>
+            <button style="background:none; border:none; color:#666; margin-top:10px;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="paymentModal" class="modal" aria-hidden="true">
+        <div class="modal-box small-modal" role="dialog" aria-modal="true">
+            <h3 style="color:var(--primary); text-align: center;">SCAN & PAY (UPI)</h3>
+            <p id="pay-item-name" style="color:white; margin-bottom:5px;">Product Name</p>
+            <p id="pay-amount" style="font-size:1.4rem; font-weight:bold; margin:10px 0; color:#fff; text-align: center;">₹0</p>
+            <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=EXAMPLE@UPI&pn=Admin" class="qr-img" alt="UPI QR"> 
+            
+            <p style="color:white; margin-bottom:5px; text-align: left;">Transaction ID (UTR):</p>
+            <input type="text" id="utr-input" placeholder="Enter Transaction ID">
+            
+            <button class="btn" onclick="submitPaymentRequest()">SEND FOR APPROVAL</button>
+            <button style="background:none; border:none; color:#666; margin-top:10px;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="adminDashboardModal" class="modal" aria-hidden="true">
+        <div class="modal-box" style="max-width:960px;" role="dialog" aria-modal="true">
+            <h2 style="color:var(--primary); text-align:center;">ADMIN DASHBOARD</h2>
+            <p style="color:#aaa; text-align:center; margin-bottom:8px;">Manage site data below. (Gmail & password guarded via Facebook icon fast clicks)</p>
+            <div class="admin-controls">
+                <button class="btn" onclick="openAdminSection('preview')">Preview Video</button>
+                <button class="btn" onclick="openAdminSection('purchaseRequests')">Hack Purchase Request</button>
+                <button class="btn" onclick="openAdminSection('setup')">Setup Video</button>
+                <button class="btn" onclick="openAdminSection('flash')">Flash Sell Control</button>
+                <button class="btn" onclick="openAdminSection('subscription')">Subscription Request</button>
+                <button class="btn" onclick="openAdminSection('hacklink')">Hack Link Set</button>
+                <button class="btn" onclick="openAdminSection('social')">Social Media URL</button>
+                <button class="btn" onclick="openAdminSection('qr')">QR Code Image</button>
+            </div>
+
+            <hr style="border-color:#333; margin:10px 0;">
+
+            <div id="admin-section-area" style="min-height:300px;">
+                </div>
+
+            <div style="text-align:center; margin-top:12px;">
+                <button style="background:none; border:none; color:#ccc; font-size:1rem;" onclick="closeAdminDashboard()">Close Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STORAGE (Simulation) ---
+        const USERS_KEY = 'ff_users_db';
+        const REQUESTS_KEY = 'ff_requests_db';
+        const FLASH_KEY = 'ff_flash_sale';
+        const ADMIN_INSTA_KEY = 'ff_admin_insta';
+        const PREVIEW_KEY = 'ff_preview_links';
+        const SETUP_KEY = 'ff_setup_links';
+        const HACK_LINKS_KEY = 'ff_hack_download_links'; // productId -> download URL
+        const SOCIAL_KEY = 'ff_social_links'; // instagram, youtube
+        const ADMIN_UPI_KEY = 'ff_admin_upi_qr'; // NEW: store admin QR image URL or data URL
+
+        let currentUser = null;
+        let flashInterval = null;
+
+        // Admin credentials as requested
+        const ADMIN_EMAIL_SECRET = "hyperliveyt09@gmail.com";
+        const ADMIN_PASS_SECRET = "8604789395";
+
+        // Admin Config (default QR)
+        const ADMIN_UPI_QR = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=yourupi@okaxis&pn=ProPanelAdmin"; 
+
+        // --- UTIL: read current admin QR (from localStorage fallback to default) ---
+        function getAdminQR() {
+            try {
+                const stored = localStorage.getItem(ADMIN_UPI_KEY);
+                if (stored && stored.trim().length > 0) return stored;
+            } catch (e) {
+                console.warn("Error reading admin QR from storage:", e);
+            }
+            return ADMIN_UPI_QR;
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            checkFlashSale();
+            loadSocialLinksToFooter();
+        };
+
+        // --- QUICK ADMIN ACCESS via FB icon clicks (5 fast clicks) ---
+        let fbClickCount = 0;
+        let fbTimer = null;
+        function adminFacebookClick(e) {
+            e.preventDefault();
+            fbClickCount++;
+            clearTimeout(fbTimer);
+            if (fbClickCount >= 5) {
+                fbClickCount = 0;
+                adminAccessPrompt();
+            } else {
+                fbTimer = setTimeout(() => { fbClickCount = 0; }, 1000);
+            }
+        }
+        function adminAccessPrompt() {
+            const email = prompt("Enter admin Gmail:");
+            if (email === null) return; // cancelled
+            if (email.trim() !== ADMIN_EMAIL_SECRET) {
+                alert("Incorrect admin email.");
+                return;
+            }
+            const pass = prompt("Enter admin password:");
+            if (pass === null) return;
+            if (pass.trim() !== ADMIN_PASS_SECRET) {
+                alert("Incorrect admin password.");
+                return;
+            }
+            // success -> open dashboard
+            openAdminDashboard();
+        }
+
+        // --- Sidebar toggle (FIX ADDED) ---
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            if (!sb) return;
+            const isActive = sb.classList.toggle('active');
+            sb.setAttribute('aria-hidden', (!isActive).toString());
+        }
+
+        // --- ADMIN DASHBOARD UI ---
+        function openAdminDashboard() {
+            document.getElementById('adminDashboardModal').style.display = 'flex';
+            openAdminSection('preview');
+        }
+        function closeAdminDashboard() {
+            document.getElementById('adminDashboardModal').style.display = 'none';
+            document.getElementById('admin-section-area').innerHTML = '';
+        }
+
+        // Utility: escape attribute values in injected HTML
+        function escapeAttr(s) {
+            if(!s) return '';
+            return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        function openAdminSection(section) {
+            const area = document.getElementById('admin-section-area');
+            area.innerHTML = ''; // clear
+            if (section === 'preview') {
+                const previews = JSON.parse(localStorage.getItem(PREVIEW_KEY) || '{}');
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Manage Preview Video Links</h3>
+                    <p style="color:#aaa;">Set YouTube preview link for each product. Save -> changes go live immediately.</p>
+                    <input id="admin_preview_1" placeholder="Preview link for Only Headshot (Product 1)" value="${escapeAttr(previews['1']||'')}">
+                    <input id="admin_preview_2" placeholder="Preview link for Headshot & Location (Product 2)" value="${escapeAttr(previews['2']||'')}">
+                    <input id="admin_preview_3" placeholder="Preview link for Magic Bullet (Product 3)" value="${escapeAttr(previews['3']||'')}">
+                    <div style="text-align:right;"><button class="btn" onclick="savePreviewLinksFromDashboard()">Save Preview Links</button></div>
+                `;
+            } else if (section === 'purchaseRequests') {
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Hack Purchase Requests</h3>
+                    <div id="admin_purchase_requests_list"></div>
+                `;
+                renderAdminRequests('product');
+            } else if (section === 'setup') {
+                const setups = JSON.parse(localStorage.getItem(SETUP_KEY) || '{}');
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Manage Setup / Guide Video Links</h3>
+                    <p style="color:#aaa;">Set setup/guide video for each product. Save -> changes go live immediately.</p>
+                    <input id="admin_setup_1" placeholder="Setup link for Only Headshot (Product 1)" value="${escapeAttr(setups['1']||'')}">
+                    <input id="admin_setup_2" placeholder="Setup link for Headshot & Location (Product 2)" value="${escapeAttr(setups['2']||'')}">
+                    <input id="admin_setup_3" placeholder="Setup link for Magic Bullet (Product 3)" value="${escapeAttr(setups['3']||'')}">
+                    <div style="text-align:right;"><button class="btn" onclick="saveSetupLinksFromDashboard()">Save Setup Links</button></div>
+                `;
+            } else if (section === 'flash') {
+                const flash = JSON.parse(localStorage.getItem(FLASH_KEY) || '{}');
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Flash Sell Control</h3>
+                    <select id="admin_flash_select">
+                        <option value="1">Only Headshot</option>
+                        <option value="2">Headshot & Location</option>
+                        <option value="3">Magic Bullet & Hologram</option>
+                    </select>
+                    <input id="admin_flash_price" type="number" placeholder="Flash Price (₹)" value="${flash.price||''}">
+                    <input id="admin_flash_timer" type="number" placeholder="Timer (Minutes)">
+                    <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                        <button class="btn" onclick="adminSetFlashSaleFromDashboard()">Start Flash Sell</button>
+                        <button class="btn" style="background:#cc0000;color:white;" onclick="adminStopFlashSaleFromDashboard()">Stop Flash Sell</button>
+                    </div>
+                    <div style="margin-top:10px;"><p style="color:#aaa;">Current: ${flash.active ? `Product ${flash.productId} @ ₹${flash.price}` : 'No active flash sale'}</p></div>
+                `;
+            } else if (section === 'subscription') {
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Subscription Requests</h3>
+                    <div id="admin_subscription_requests_list"></div>
+                `;
+                renderAdminRequests('subscription');
+            } else if (section === 'hacklink') {
+                const links = JSON.parse(localStorage.getItem(HACK_LINKS_KEY) || '{}');
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Hack Download Links</h3>
+                    <p style="color:#aaa;">Set the download link (or file URL) that customers will get after approval.</p>
+                    <input id="hack_link_1" placeholder="Download link for Only Headshot (Product 1)" value="${escapeAttr(links['1']||'')}">
+                    <input id="hack_link_2" placeholder="Download link for Headshot & Location (Product 2)" value="${escapeAttr(links['2']||'')}">
+                    <input id="hack_link_3" placeholder="Download link for Magic Bullet (Product 3)" value="${escapeAttr(links['3']||'')}">
+                    <div style="text-align:right;"><button class="btn" onclick="saveHackLinksFromDashboard()">Save Hack Links</button></div>
+                `;
+            } else if (section === 'social') {
+                const social = JSON.parse(localStorage.getItem(SOCIAL_KEY) || '{}');
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">Social Media Links</h3>
+                    <p style="color:#aaa;">Set Instagram and YouTube links for footer icons.</p>
+                    <input id="social_insta" placeholder="Instagram URL" value="${escapeAttr(social.instagram||'')}">
+                    <input id="social_yt" placeholder="YouTube URL" value="${escapeAttr(social.youtube||'')}">
+                    <div style="text-align:right;"><button class="btn" onclick="saveSocialLinksFromDashboard()">Save Social Links</button></div>
+                `;
+            } else if (section === 'qr') {
+                // NEW: QR admin section (URL or upload)
+                const storedQR = localStorage.getItem(ADMIN_UPI_KEY) || '';
+                const previewSrc = storedQR || ADMIN_UPI_QR;
+                area.innerHTML = `
+                    <h3 style="color:var(--primary);">QR Code Image</h3>
+                    <p style="color:#aaa;">Set the QR image (URL or upload) that customers will see in payment modal while buying.</p>
+                    <label style="color:#ccc; font-size:0.9rem;">QR Image URL</label>
+                    <input id="admin_qr_input" placeholder="https://domain/.../qr.png or data:image/..." value="${escapeAttr(storedQR||'')}">
+                    <label style="color:#ccc; font-size:0.9rem; margin-top:8px;">Or upload image</label>
+                    <input id="admin_qr_file" type="file" accept="image/*" onchange="handleQRFileSelect(event)">
+                    <div style="text-align:center; margin-top:10px;">
+                        <img id="admin_qr_preview" src="${escapeAttr(previewSrc)}" alt="QR Preview" style="max-width:220px; border:1px solid #333; display:block; margin:10px auto; border-radius:6px;">
+                    </div>
+                    <div style="text-align:right;"><button class="btn" onclick="saveQRFromDashboard()">Save QR Image</button></div>
+                    <p style="color:#aaa; font-size:0.85rem; margin-top:8px;">Tip: You can paste a data URL (base64) or a public image URL. Uploaded images are saved as data URLs in localStorage.</p>
+                `;
+            }
+        }
+
+        // --- Save & Populate handlers used by admin dashboard ---
+        function savePreviewLinksFromDashboard() {
+            const l1 = document.getElementById('admin_preview_1').value.trim();
+            const l2 = document.getElementById('admin_preview_2').value.trim();
+            const l3 = document.getElementById('admin_preview_3').value.trim();
+            const obj = {"1": l1, "2": l2, "3": l3};
+            localStorage.setItem(PREVIEW_KEY, JSON.stringify(obj));
+            alert("Preview links saved. Live now.");
+        }
+
+        function saveSetupLinksFromDashboard() {
+            const s1 = document.getElementById('admin_setup_1').value.trim();
+            const s2 = document.getElementById('admin_setup_2').value.trim();
+            const s3 = document.getElementById('admin_setup_3').value.trim();
+            const obj = {"1": s1, "2": s2, "3": s3};
+            localStorage.setItem(SETUP_KEY, JSON.stringify(obj));
+            alert("Setup links saved. Live now.");
+        }
+
+        function adminSetFlashSaleFromDashboard() {
+            const prodId = document.getElementById('admin_flash_select').value;
+            const price = document.getElementById('admin_flash_price').value;
+            const mins = document.getElementById('admin_flash_timer').value;
+            if(!price || !mins) return alert("Fill details");
+            const endTime = new Date().getTime() + (mins * 60 * 1000);
+            const flashData = { active: true, productId: prodId, price: price, endTime: endTime };
+            localStorage.setItem(FLASH_KEY, JSON.stringify(flashData));
+            alert("Flash Sale Started! Live now.");
+            checkFlashSale();
+        }
+        function adminStopFlashSaleFromDashboard() {
+            localStorage.removeItem(FLASH_KEY);
+            alert("Flash Sale Stopped");
+            checkFlashSale();
+        }
+
+        function saveHackLinksFromDashboard() {
+            const h1 = document.getElementById('hack_link_1').value.trim();
+            const h2 = document.getElementById('hack_link_2').value.trim();
+            const h3 = document.getElementById('hack_link_3').value.trim();
+            const obj = {"1": h1, "2": h2, "3": h3};
+            localStorage.setItem(HACK_LINKS_KEY, JSON.stringify(obj));
+            alert("Hack download links saved. Live now.");
+        }
+
+        function saveSocialLinksFromDashboard() {
+            const insta = document.getElementById('social_insta').value.trim();
+            const yt = document.getElementById('social_yt').value.trim();
+            const obj = { instagram: insta, youtube: yt };
+            localStorage.setItem(SOCIAL_KEY, JSON.stringify(obj));
+            loadSocialLinksToFooter();
+            alert("Social links saved. Live now.");
+        }
+
+        // NEW: handle file input -> convert to data URL and preview
+        function handleQRFileSelect(event) {
+            const file = (event.target && event.target.files && event.target.files[0]) ? event.target.files[0] : null;
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const preview = document.getElementById('admin_qr_preview');
+                const input = document.getElementById('admin_qr_input');
+                if (preview) preview.src = dataUrl;
+                if (input) input.value = dataUrl; // set input to data URL so save uses it
+            };
+            reader.onerror = function(err) {
+                console.error("Error reading file", err);
+                alert("Failed to read image file.");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // NEW: save QR from admin area (either URL in input or data URL from upload)
+        function saveQRFromDashboard() {
+            const input = document.getElementById('admin_qr_input');
+            const preview = document.getElementById('admin_qr_preview');
+            if (!input || !preview) return alert("QR elements not found.");
+
+            const val = input.value.trim();
+            if (!val) return alert("Please provide a QR image URL or upload a file.");
+
+            try {
+                localStorage.setItem(ADMIN_UPI_KEY, val);
+                // update currently open payment modal preview if present
+                const paymentQr = document.getElementById('qr-code-img');
+                if (paymentQr) paymentQr.src = getAdminQR();
+                alert("QR image saved. Customers will see this QR during payment.");
+            } catch (e) {
+                console.error("Failed to save QR image:", e);
+                alert("Failed to save QR image (storage error).");
+            }
+        }
+
+        // Load social links to footer icons
+        function loadSocialLinksToFooter() {
+            const social = JSON.parse(localStorage.getItem(SOCIAL_KEY) || '{}');
+            const instaEl = document.getElementById('insta-icon');
+            const ytEl = document.getElementById('yt-icon');
+            const fbEl = document.getElementById('fb-icon');
+            if (social.instagram && social.instagram.trim().length>0) {
+                instaEl.href = social.instagram;
+                instaEl.target = "_blank";
+            } else {
+                instaEl.href = "#";
+                instaEl.removeAttribute('target');
+            }
+            if (social.youtube && social.youtube.trim().length>0) {
+                ytEl.href = social.youtube;
+                ytEl.target = "_blank";
+            } else {
+                ytEl.href = "#";
+                ytEl.removeAttribute('target');
+            }
+            const adminInsta = localStorage.getItem(ADMIN_INSTA_KEY) || "#";
+            const adminInstabtn = document.getElementById('admin-insta-redirect');
+            if(adminInstabtn) adminInstabtn.href = adminInsta;
+        }
+
+        // --- AUTH LOGIC (existing) ---
+        function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
+        function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+        window.openLoginModal = () => document.getElementById('loginModal').style.display = 'flex';
+        window.openSignupModal = () => document.getElementById('signupModal').style.display = 'flex';
+        window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+
+        window.signupUser = () => {
+            const email = document.getElementById('signup-email').value;
+            const pass = document.getElementById('signup-pass').value;
+            if(!email || pass.length < 6) return alert("Valid Email & Pass (Min 6) required");
+            
+            let users = getUsers();
+            if(users.find(u => u.email === email)) return alert("User already exists!");
+
+            users.push({ email, pass, purchases: [], subscription: false });
+            saveUsers(users);
+            alert("Signup Success! Please Login.");
+            closeModals();
+            window.openLoginModal();
+        }
+
+        window.loginUser = () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            let users = getUsers();
+            const user = users.find(u => u.email === email && u.pass === pass);
+            
+            if(user) {
+                currentUser = user;
+                closeModals();
+                updateUIForUser();
+            } else {
+                alert("Invalid Credentials");
+            }
+        }
+
+        window.logoutUser = () => {
+            currentUser = null;
+            location.reload();
+        }
+
+        function updateUIForUser() {
+            document.getElementById('auth-controls').style.display = 'none';
+            document.getElementById('user-dashboard-btns').style.display = 'flex';
+            document.getElementById('welcome-message').innerHTML = `Welcome, <span style="color:var(--primary)">${currentUser.email.split('@')[0]}</span>`;
+            
+            if (currentUser.subscription) {
+                document.getElementById('vip-unlocked-msg').style.display = 'block';
+                document.getElementById('sub-status-area').innerHTML = '<p style="color:var(--primary); font-weight:bold;">YOU ARE A VIP MEMBER</p>';
+                document.getElementById('admin-contact-area').style.display = 'block';
+                
+                const link = localStorage.getItem(ADMIN_INSTA_KEY) || "#";
+                const adminContact = document.getElementById('admin-insta-redirect');
+                if(adminContact) adminContact.href = link;
+            }
+
+            window.viewProductSection();
+        }
+
+        window.viewProductSection = () => {
+            document.getElementById('main-product-section').style.display = 'block';
+            document.getElementById('user-content-section').style.display = 'none';
+        }
+
+        window.showDashboard = (type) => {
+            document.getElementById('main-product-section').style.display = 'none';
+            document.getElementById('user-content-section').style.display = 'block';
+            if(type === 'purchases') {
+                document.getElementById('my-purchases').style.display = 'block';
+                document.getElementById('my-requests').style.display = 'none';
+                renderPurchases();
+            } else {
+                document.getElementById('my-purchases').style.display = 'none';
+                document.getElementById('my-requests').style.display = 'block';
+                renderRequests();
+            }
+        }
+
+        window.showRequests = () => {
+            document.getElementById('main-product-section').style.display = 'none';
+            document.getElementById('user-content-section').style.display = 'block';
+            document.getElementById('my-requests').style.display = 'block';
+            document.getElementById('my-purchases').style.display = 'none';
+            renderRequests();
+        }
+
+        function renderPurchases() {
+            const list = document.getElementById('purchases-list');
+            list.innerHTML = '';
+            if(!currentUser) return;
+            
+            if(currentUser.subscription) {
+                 list.innerHTML += `<div class="history-item"><h4 style="color:gold;">VIP Subscription</h4><p>Status: Active</p><a href="#" class="btn" style="width:150px; padding:5px;">VIP Active</a></div>`;
+            }
+
+            if((!currentUser.purchases || currentUser.purchases.length === 0) && !currentUser.subscription) {
+                list.innerHTML = '<p style="color:#aaa; text-align: center;">No purchases yet.</p>';
+                return;
+            }
+
+            const hackLinks = JSON.parse(localStorage.getItem(HACK_LINKS_KEY) || '{}');
+
+            (currentUser.purchases || []).forEach(p => {
+                const requested = p.requestedAt ? new Date(p.requestedAt).toLocaleString() : '';
+                const approved = p.approvedAt ? new Date(p.approvedAt).toLocaleString() : (p.date ? new Date(p.date).toLocaleString() : '');
+                let downloadHref = '#';
+                if (p.productId && hackLinks[p.productId]) downloadHref = hackLinks[p.productId];
+                else {
+                    const mapping = {"Only Headshot":"1","Headshot & Location":"2","Magic Bullet & Hologram":"3","Magic Bullet":"3"};
+                    const pid = mapping[p.itemName];
+                    if(pid && hackLinks[pid]) downloadHref = hackLinks[pid];
+                }
+                list.innerHTML += `
+                    <div class="history-item">
+                        <h4>${p.itemName}</h4>
+                        <p>Paid: ₹${p.amount}</p>
+                        ${ requested ? `<p style="color:#aaa; font-size:0.9rem;">Requested: ${requested}</p>` : '' }
+                        ${ approved ? `<p style="color:#aaa; font-size:0.9rem;">Approved: ${approved}</p>` : '' }
+                        <a href="${downloadHref}" target="_blank" class="btn" style="width:150px; padding:5px;">DOWNLOAD LINK</a>
+                    </div>
+                `;
+            });
+        }
+
+        // --- REQUESTS (User-side) ---
+        function renderRequests() {
+            if(!currentUser) return alert("Please Login First!");
+            const listEl = document.getElementById('requests-list');
+            const allRequests = JSON.parse(localStorage.getItem(REQUESTS_KEY) || '[]');
+            const userRequests = allRequests.filter(r => r.userEmail === currentUser.email && r.status === 'pending');
+
+            if(userRequests.length === 0) {
+                listEl.innerHTML = '<p style="color:#aaa; text-align:center;">No pending requests.</p>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+            userRequests.forEach(r => {
+                const requested = r.requestedAt ? new Date(r.requestedAt).toLocaleString() : r.timestamp;
+                listEl.innerHTML += `
+                    <div class="history-item pending">
+                        <h4 style="color:white; margin-bottom:6px;">${r.itemName} (₹${r.amount})</h4>
+                        <p style="color:#aaa; font-size:0.9rem;">UTR: ${r.utr}</p>
+                        <p style="color:#aaa; font-size:0.9rem;">Requested: ${requested}</p>
+                        <p style="color:orange; font-size:0.9rem;">Status: Pending Approval</p>
+                    </div>
+                `;
+            });
+        }
+
+        // --- PREVIEW & SETUP VIDEO LOGIC (user) ---
+        window.openPreview = (productId) => {
+            try {
+                const previews = JSON.parse(localStorage.getItem(PREVIEW_KEY) || '{}');
+                const link = previews[String(productId)];
+                if (link && link.trim().length > 0) {
+                    window.open(link, '_blank');
+                } else {
+                    alert("Preview not available for this product.");
+                }
+            } catch (e) {
+                console.error("Error opening preview:", e);
+                alert("Preview not available.");
+            }
+        }
+
+        window.openSetupVideo = (productId) => {
+            try {
+                const setups = JSON.parse(localStorage.getItem(SETUP_KEY) || '{}');
+                const link = setups[String(productId)];
+                if (link && link.trim().length > 0) {
+                    window.open(link, '_blank');
+                } else {
+                    alert("Setup video not available for this product.");
+                }
+            } catch (e) {
+                console.error("Error opening setup video:", e);
+                alert("Setup video not available.");
+            }
+        }
+
+        // --- PAYMENT & SUBSCRIPTION LOGIC ---
+        let pendingTransaction = null;
+
+        window.initiatePurchase = (id, name, price) => {
+            if(!currentUser) return alert("Please Login First!");
+            
+            if(currentUser.subscription) {
+                alert(`VIP ACCESS: You have unlocked ${name} successfully! Check 'My Purchases'.`);
+                let users = getUsers();
+                let uIndex = users.findIndex(u => u.email === currentUser.email);
+                users[uIndex].purchases.push({ itemName: name, amount: 0, date: new Date(), requestedAt: new Date().toISOString(), approvedAt: new Date().toISOString(), productId: String(id) });
+                saveUsers(users);
+                currentUser = users[uIndex];
+                return;
+            }
+
+            const flash = JSON.parse(localStorage.getItem(FLASH_KEY));
+            if(flash && flash.active && flash.productId == id) {
+                const now = new Date().getTime();
+                if(now < flash.endTime) {
+                    price = flash.price;
+                }
+            }
+
+            openPaymentModal(id, name, price, 'product');
+        }
+
+        window.buySubscription = () => {
+            if(!currentUser) return alert("Please Login First!");
+            if(currentUser.subscription) return alert("You are already a VIP!");
+            openPaymentModal(null, "VIP Subscription", 149, 'subscription');
+        }
+
+        function openPaymentModal(productId, name, amount, type) {
+            pendingTransaction = { productId: productId ? String(productId) : null, name, amount, type };
+            document.getElementById('pay-item-name').innerText = name;
+            document.getElementById('pay-amount').innerText = "₹" + amount;
+            // use admin-configured QR (data URL or URL) or fallback default
+            document.getElementById('qr-code-img').src = getAdminQR();
+            document.getElementById('utr-input').value = '';
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        window.submitPaymentRequest = () => {
+            if(!currentUser) return alert("Please Login First!");
+            const utr = document.getElementById('utr-input').value;
+            if(!utr || utr.length < 6) return alert("Please enter valid Transaction ID");
+
+            let requests = JSON.parse(localStorage.getItem(REQUESTS_KEY) || '[]');
+            const reqObj = {
+                id: Date.now(),
+                userEmail: currentUser.email,
+                itemName: pendingTransaction.name,
+                amount: pendingTransaction.amount,
+                type: pendingTransaction.type,
+                productId: pendingTransaction.productId, // may be null for subscription
+                utr: utr,
+                requestedAt: new Date().toISOString(),
+                status: 'pending',
+                timestamp: new Date().toLocaleString()
+            };
+            requests.push(reqObj);
+            localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
+            alert("Payment Request Sent! Wait for Admin Approval.");
+            closeModals();
+            if(document.getElementById('my-requests').style.display === 'block') renderRequests();
+            // refresh admin list if open
+            renderAdminRequests('product');
+            renderAdminRequests('subscription');
+        }
+
+        // --- ADMIN: Requests rendering and actions (supports both product and subscription) ---
+        function renderAdminRequests(filterType) {
+            const requests = JSON.parse(localStorage.getItem(REQUESTS_KEY) || '[]');
+            const listContainer = (filterType === 'subscription') ? document.getElementById('admin_subscription_requests_list') : document.getElementById('admin_purchase_requests_list');
+            if(!listContainer) return;
+            const filtered = requests.filter(r => r.status === 'pending' && (filterType ? r.type === filterType : true));
+            if(filtered.length === 0) {
+                listContainer.innerHTML = '<p style="color:#777;">No Pending Requests</p>';
+                return;
+            }
+            const hackLinks = JSON.parse(localStorage.getItem(HACK_LINKS_KEY) || '{}');
+
+            listContainer.innerHTML = '';
+            filtered.forEach((req) => {
+                const requested = req.requestedAt ? new Date(req.requestedAt).toLocaleString() : req.timestamp;
+                const approveBtn = `<button class="btn-approve" onclick="approveRequestById(${req.id})">Approve</button>`;
+                const rejectBtn = `<button class="btn-delete" onclick="deleteRequestById(${req.id})">Reject</button>`;
+                let downloadPreview = '';
+                if(req.productId && hackLinks[req.productId]) {
+                    downloadPreview = `<p style="color:#aaa; font-size:0.85rem;">Current download link: <a href="${hackLinks[req.productId]}" target="_blank" style="color:var(--primary)">Open</a></p>`;
+                }
+                listContainer.innerHTML += `
+                    <div class="admin-request-item">
+                        <div style="flex:1 1 220px; min-width:0;">
+                            <p style="color:white; font-weight:bold;">${req.itemName} (₹${req.amount})</p>
+                            <p style="color:#aaa; font-size:0.85rem;">User: ${req.userEmail}</p>
+                            <p style="color:#aaa; font-size:0.85rem;">UTR: ${req.utr}</p>
+                            <p style="color:#aaa; font-size:0.85rem;">Requested: ${requested}</p>
+                            <p style="color:#aaa; font-size:0.85rem;">Type: ${req.type.toUpperCase()}</p>
+                            ${downloadPreview}
+                        </div>
+                        <div class="admin-action-btns">${approveBtn}${rejectBtn}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Approve / Delete by request id (safer than index)
+        window.approveRequestById = (id) => {
+            let requests = JSON.parse(localStorage.getItem(REQUESTS_KEY) || '[]');
+            const rIndex = requests.findIndex(r => r.id === id);
+            if(rIndex === -1) return alert("Request not found");
+            const req = requests[rIndex];
+
+            let users = getUsers();
+            const uIndex = users.findIndex(u => u.email === req.userEmail);
+            if(uIndex === -1) return alert("User not found");
+
+            const approvedAt = new Date().toISOString();
+
+            if(req.type === 'subscription') {
+                users[uIndex].subscription = true;
+                users[uIndex].purchases = users[uIndex].purchases || [];
+                users[uIndex].purchases.push({
+                    itemName: 'VIP Subscription',
+                    amount: req.amount,
+                    requestedAt: req.requestedAt,
+                    approvedAt: approvedAt,
+                    productId: null
+                });
+            } else {
+                users[uIndex].purchases = users[uIndex].purchases || [];
+                users[uIndex].purchases.push({
+                    itemName: req.itemName,
+                    amount: req.amount,
+                    requestedAt: req.requestedAt,
+                    approvedAt: approvedAt,
+                    productId: req.productId || null
+                });
+            }
+
+            saveUsers(users);
+            requests.splice(rIndex,1);
+            localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
+            alert("Approved successfully. User purchase updated.");
+
+            renderAdminRequests('product');
+            renderAdminRequests('subscription');
+
+            if(currentUser && currentUser.email === users[uIndex].email) {
+                currentUser = users[uIndex];
+                renderPurchases();
+                if(document.getElementById('my-requests').style.display === 'block') renderRequests();
+            }
+        }
+
+        window.deleteRequestById = (id) => {
+            let requests = JSON.parse(localStorage.getItem(REQUESTS_KEY) || '[]');
+            const rIndex = requests.findIndex(r => r.id === id);
+            if(rIndex === -1) return alert("Request not found");
+            requests.splice(rIndex,1);
+            localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
+            alert("Request removed.");
+            renderAdminRequests('product');
+            renderAdminRequests('subscription');
+            if(document.getElementById('my-requests').style.display === 'block') renderRequests();
+        }
+
+        // --- FLASH SALE LOGIC (existing) ---
+        window.adminSetFlashSale = () => {
+            const prodId = document.getElementById('flash-product-select').value;
+            const price = document.getElementById('flash-price-input').value;
+            const mins = document.getElementById('flash-timer-input').value;
+
+            if(!price || !mins) return alert("Fill details");
+
+            const endTime = new Date().getTime() + (mins * 60 * 1000);
+            const flashData = { active: true, productId: prodId, price: price, endTime: endTime };
+            
+            localStorage.setItem(FLASH_KEY, JSON.stringify(flashData));
+            alert("Flash Sale Started!");
+            checkFlashSale();
+        }
+
+        window.adminStopFlashSale = () => {
+            localStorage.removeItem(FLASH_KEY);
+            alert("Flash Sale Stopped");
+            checkFlashSale();
+        }
+
+        function checkFlashSale() {
+            const flash = JSON.parse(localStorage.getItem(FLASH_KEY));
+            const container = document.getElementById('active-flash-container');
+            
+            if(flashInterval) clearInterval(flashInterval);
+
+            if(!flash || !flash.active) {
+                if(container) container.innerHTML = '<p style="color:#aaa; text-align:center;">No active flash sales right now.</p>';
+                return;
+            }
+
+            const productNames = { "1": "Only Headshot", "2": "Headshot & Location", "3": "Magic Bullet" };
+            const originalPrices = { "1": 49, "2": 79, "3": 99 };
+
+            flashInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = flash.endTime - now;
+
+                if (distance < 0) {
+                    clearInterval(flashInterval);
+                    localStorage.removeItem(FLASH_KEY);
+                    checkFlashSale();
+                    return;
+                }
+
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                if(container) container.innerHTML = `
+                    <div class="flash-deal-box">
+                        <h4 style="color:white;">${productNames[flash.productId]}</h4>
+                        <span class="old-price">₹${originalPrices[flash.productId]}</span> 
+                        <span class="flash-price">₹${flash.price}</span>
+                        <div class="timer">Ends in: ${minutes}m ${seconds}s</div>
+                        <button class="btn" style="margin-top:10px; padding:8px 10px; font-size:0.9rem;" onclick="initiatePurchase(${flash.productId}, '${productNames[flash.productId]}', ${flash.price})">GRAB NOW</button>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // Admin Insta (kept for VIP contact)
+        window.saveAdminInsta = () => {
+            const link = document.getElementById('admin-insta-input').value;
+            localStorage.setItem(ADMIN_INSTA_KEY, link);
+            alert("Instagram Link Saved");
+            loadSocialLinksToFooter();
+        }
+
+        // Extra: toggleOption used by sidebar sections
+        function toggleOption(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle('show');
+        }
+
+        // Placeholder for whatsapp and other small functions referenced
+        function openWhatsappSupport() { alert("Open WhatsApp Support (not implemented)"); }
+        function handleLogoClick() { /* existing - placeholder */ }
+    </script>
+</body>
+</html>
